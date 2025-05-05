@@ -1,0 +1,66 @@
+def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
+    Score = 0
+    GameOver = False
+    frozenTargets = []
+    while not GameOver:
+        freezeInput = input("Do you want to freeze or unfreeze?: ")
+        if freezeInput == "freeze":
+            index = int(input("what index do you want to freeze?: "))
+            while Targets[index] == -1:
+                index = int(input("what index do you want to freeze?: "))
+            frozenTargets.append(index-1)
+        elif freezeInput == "unfreeze":
+            unfreezeInput = int(input("Which target do you want to unfreeze?: "))
+            while unfreezeInput not in frozenTargets:
+                unfreezeInput = int(input("Which target do you want to unfreeze?: "))
+            frozenTargets.remove(unfreezeInput)
+        DisplayState(Targets, NumbersAllowed, Score, frozenTargets)
+        UserInput = input("Enter an expression: ")
+        print()
+        while not CheckIfUserInputValid(UserInput):
+            print("Enter valid format")
+            UserInput = input("Enter an expression: ")
+        UserInputInRPN = ConvertToRPN(UserInput)
+        if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+            IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+            if IsTarget:
+                NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
+                NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        Score -= 1
+        if Targets[0] != -1:
+            GameOver = True
+        else:
+            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget, frozenTargets)
+    print("Game over!")
+    DisplayScore(Score)
+
+def UpdateTargets(Targets, TrainingGame, MaxTarget, frozenTargets):
+    for Count in range(0, len(Targets) - 1):
+        if Count + 1 in frozenTargets:
+            Targets[Count] = Targets[Count + 2]
+        elif Count in frozenTargets:
+            pass
+        else:
+            Targets[Count] = Targets[Count + 1]
+    Targets.pop()
+    if TrainingGame:
+        Targets.append(Targets[-1])
+    else:
+        Targets.append(GetTarget(MaxTarget))
+    return Targets
+
+def DisplayTargets(Targets, frozenTargets):
+    i = 0
+    print("|", end='')
+    for T in Targets:
+        if T == -1:
+            print(" ", end='')
+        else:
+            if i in frozenTargets:
+                print("<",T,">", end='')
+            else:
+                print(T, end='')
+        print("|", end='')
+        i += 1
+    print()
+    print()
