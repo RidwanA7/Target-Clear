@@ -1,0 +1,29 @@
+def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
+    UserInputEvaluation = EvaluateRPN(UserInputInRPN)
+    timesAppeared = 0
+    UserInputEvaluationIsATarget = False
+    if UserInputEvaluation != -1:
+        for Count in range(0, len(Targets)):
+            if Targets[Count] == UserInputEvaluation:
+                timesAppeared += 1
+                Score += 2
+                Targets[Count] = -1
+                UserInputEvaluationIsATarget = True
+    if UserInputEvaluationIsATarget:
+        print("Your expression evaluated to ", UserInputEvaluation, "and it appeared ", timesAppeared, "times")
+    if not UserInputEvaluationIsATarget:
+        print("Your expression evaluated to ", UserInputEvaluation, "and it was not a target")
+    return UserInputEvaluationIsATarget, Score
+
+def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+    Temp = []
+    for Item in NumbersAllowed:
+        Temp.append(Item)
+    for Item in UserInputInRPN:
+        if CheckValidNumber(Item, MaxNumber):
+            if int(Item) in Temp:
+                Temp.remove(int(Item))
+            else:
+                print(Item, "is not a number allowed")
+                return False
+    return True
