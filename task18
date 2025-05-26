@@ -1,0 +1,23 @@
+#no dups
+def CreateTargets(SizeOfTargets, MaxTarget):
+    Targets = []
+    for Count in range(1, 6):
+        Targets.append(-1)
+    for Count in range(1, SizeOfTargets - 4):
+        targetToAdd = GetTarget(MaxTarget)
+        while targetToAdd in Targets:
+            targetToAdd = GetTarget(MaxTarget)
+        Targets.append(targetToAdd)
+    return Targets
+
+
+def FillNumbers(NumbersAllowed, TrainingGame, MaxNumber):
+    if TrainingGame:
+        return [2, 3, 2, 8, 512]
+    else:
+        while len(NumbersAllowed) < 5:
+            numToAdd = GetNumber(MaxNumber)
+            while numToAdd in NumbersAllowed:
+                numToAdd = GetNumber(MaxNumber)
+            NumbersAllowed.append(numToAdd)
+        return NumbersAllowed
