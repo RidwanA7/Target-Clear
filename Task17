@@ -1,0 +1,61 @@
+#task asked for doing it in CovertToRPN
+def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
+    Score = 0
+    GameOver = False
+    while not GameOver:
+        postfix = False
+        DisplayState(Targets, NumbersAllowed, Score)
+        inputType = input("Do you want to enter in infix or postfix?: ")
+        if inputType == "postfix":
+            postfix  = True
+        UserInput = input("Enter an expression: ")
+        print()
+        if not postfix:
+            if CheckIfUserInputValid(UserInput):
+                UserInputInRPN = ConvertToRPN(UserInput)
+                #print(UserInputInRPN)
+                if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+                    IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                    if IsTarget:
+                        NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed, postfix)
+                        NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        else:
+            inputInRpn = []
+            item = ''
+            operators = ['+', '-', '*', '/']
+            for i in range(len(UserInput)):
+                if UserInput[i] in operators:
+                    inputInRpn.append(UserInput[i])
+                    item = ''
+                elif UserInput[i] != ',':
+                    item += UserInput[i]
+                else:
+                    if item != '':
+                        inputInRpn.append(item)
+                        item = ''
+            UserInputInRPN = inputInRpn
+            UserInput = UserInputInRPN
+            if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+                IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+                if IsTarget:
+                    NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed, postfix)
+                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+
+        Score -= 1
+        if Targets[0] != -1:
+            GameOver = True
+        else:
+            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)
+    print("Game over!")
+    DisplayScore(Score)
+
+def RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed, postfix):
+    if not postfix:
+        UserInputInRPN = ConvertToRPN(UserInput)
+    else:
+        UserInputInRPN = UserInput
+    for Item in UserInputInRPN:
+        if CheckValidNumber(Item, MaxNumber):
+            if int(Item) in NumbersAllowed:
+                NumbersAllowed.remove(int(Item))
+    return NumbersAllowed
