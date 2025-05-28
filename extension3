@@ -1,0 +1,72 @@
+def Main():
+    NumbersAllowed = []
+    Targets = []
+    MaxNumberOfTargets = 20
+    MaxTarget = 0
+    MaxNumber = 0
+    TrainingGame = False
+    Choice = input("Enter y to play the training game, anything else to play a random game: ").lower()
+    print()
+    if Choice == "y":
+        MaxNumber = 1000
+        MaxTarget = 1000
+        TrainingGame = True
+        Targets1 = [-1, -1, -1, -1, -1, 23, 9, 140, 82, 121, 34, 45, 68, 75, 34, 23, 119, 43, 23, 119]
+        Targets2 = [-1, -1, -1, -1, -1, 23, 9, 140, 82, 121, 34, 45, 68, 75, 34, 23, 119, 43, 23, 119]
+    else:
+        MaxNumber = 10
+        MaxTarget = 50
+        Targets1 = CreateTargets(MaxNumberOfTargets, MaxTarget)
+        Targets2 = CreateTargets(MaxNumberOfTargets, MaxTarget)
+    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+    PlayGame(Targets1, Targets2, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber)
+    input()
+
+def PlayGame(Targets1, Targets2, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber):
+    Score1 = 0
+    Score2 = 0
+    GameOver = False
+    player1Turn = True
+    while not GameOver:
+        DisplayState(Targets1, Targets2, NumbersAllowed, Score1, Score2)
+        if player1Turn:
+            UserInput = input("Enter an expression player 1: ")
+        else:
+            UserInput = input("Enter an expression player 2: ")
+        print()
+        if CheckIfUserInputValid(UserInput):
+            UserInputInRPN = ConvertToRPN(UserInput)
+            if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+                if player1Turn:
+                    IsTarget, Score1 = CheckIfUserInputEvaluationIsATarget(Targets1, UserInputInRPN, Score1)
+                else:
+                    IsTarget, Score2 = CheckIfUserInputEvaluationIsATarget(Targets2, UserInputInRPN, Score2)
+                if IsTarget:
+                    NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
+                    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+
+        if player1Turn:
+            Score1 -= 1
+            if Targets1[0] != -1:
+                GameOver = True
+                Winner = "Player2"
+            else:
+                Targets1 = UpdateTargets(Targets1, TrainingGame, MaxTarget)
+        else:
+            Score2 -= 1
+            if Targets2[0] != -1:
+                GameOver = True
+                Winner = "Player1"
+            else:
+                Targets2 = UpdateTargets(Targets2, TrainingGame, MaxTarget)
+        player1Turn = not player1Turn
+        if Score1 == 20:
+            GameOver = True
+            Winner = "player1"
+        elif Score2 == 20:
+            GameOver = True
+            Winner = "player2"
+    print("Winnder is", Winner)
+    DisplayScore(Score1)
+    DisplayScore(Score2)
+
