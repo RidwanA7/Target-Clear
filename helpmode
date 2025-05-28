@@ -35,10 +35,13 @@ def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, helpMo
             for x in range(30):
                 operatorsAllowed = ["+", "-", "*", "/"]
                 numbers = []
+                numbersAllowedCopy = NumbersAllowed.copy()
                 operators = []
                 numberOfOperators = random.randint(1, 3)
                 for i in range(numberOfOperators + 1):
-                    numbers.append(str(NumbersAllowed[random.randint(0, 4)]))
+                    numToAdd = numbersAllowedCopy[random.randint(0, len(numbersAllowedCopy)-1)]
+                    numbers.append(str(numToAdd))
+                    numbersAllowedCopy.remove(numToAdd)
                 for j in range(numberOfOperators):
                     operators.append(operatorsAllowed[random.randint(0, 3)])
                 if numberOfOperators == 1:
