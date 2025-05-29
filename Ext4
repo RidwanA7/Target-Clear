@@ -1,0 +1,72 @@
+def Main():
+    NumbersAllowed1 = []
+    NumbersAllowed2 = []
+    Targets = []
+    MaxNumberOfTargets = 20
+    MaxTarget = 0
+    MaxNumber = 0
+    TrainingGame = False
+    Choice = input("Enter y to play the training game, anything else to play a random game: ").lower()
+    print()
+    if Choice == "y":
+        MaxNumber = 1000
+        MaxTarget = 1000
+        TrainingGame = True
+        Targets = [-1, -1, -1, -1, -1, 23, 9, 140, 82, 121, 34, 45, 68, 75, 34, 23, 119, 43, 23, 119]
+    else:
+        MaxNumber = 10
+        MaxTarget = 50
+        Targets = CreateTargets(MaxNumberOfTargets, MaxTarget)
+    NumbersAllowed1 = FillNumbers(NumbersAllowed1, TrainingGame, MaxNumber)
+    NumbersAllowed2 = FillNumbers(NumbersAllowed2, TrainingGame, MaxNumber)
+    print(NumbersAllowed1, NumbersAllowed2)
+    PlayGame(Targets, NumbersAllowed1, NumbersAllowed2, TrainingGame, MaxTarget, MaxNumber)
+    input()
+
+
+def PlayGame(Targets, NumbersAllowed1, NumbersAllowed2, TrainingGame, MaxTarget, MaxNumber):
+    Score = 0
+    GameOver = False
+    while not GameOver:
+        DisplayState(Targets, NumbersAllowed1, NumbersAllowed2, Score)
+        UserInput1 = input("Enter an expression: ")
+        print()
+        UserInputInRPN1 = ConvertToRPN(UserInput1)
+        if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed1, UserInputInRPN1, MaxNumber):
+            FirstOperand = EvaluateRPN(UserInputInRPN1)
+            UserInput2 = input("Enter an expression: ")
+            UserInputInRPN2 = ConvertToRPN(UserInput2)
+            if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed2, UserInputInRPN2, MaxNumber):
+                SecondOperand = EvaluateRPN(UserInputInRPN2)
+                print("You can use operands", FirstOperand, SecondOperand)
+                UserInput3 = input("Enter an expression for a target: ")
+                UserInputInRPN3= ConvertToRPN(UserInput3)
+                OperandsAllowed = [str(FirstOperand), str(SecondOperand)]
+                operators = ['+', '-', '/', '*']
+                valid = True
+                for item in UserInputInRPN3:
+                    if item in OperandsAllowed:
+                        OperandsAllowed.remove(item)
+                    else:
+                        if item not in operators:
+                            valid = False
+                if valid:
+                    IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN3, Score)
+                    if IsTarget:
+                        NumbersAllowed1 = RemoveNumbersUsed(UserInput1, MaxNumber, NumbersAllowed1)
+                        NumbersAllowed1 = FillNumbers(NumbersAllowed1, TrainingGame, MaxNumber)
+                        NumbersAllowed2 = RemoveNumbersUsed(UserInput2, MaxNumber, NumbersAllowed2)
+                        NumbersAllowed2 = FillNumbers(NumbersAllowed2, TrainingGame, MaxNumber)
+                else:
+                    print("Not allowed")
+            else:
+                print("Not allowed")
+        else:
+            print("Not allowed")
+        Score -= 1
+        if Targets[0] != -1:
+            GameOver = True
+        else:
+            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)
+    print("Game over!")
+    DisplayScore(Score)
