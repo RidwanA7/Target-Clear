@@ -1,0 +1,15 @@
+def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
+    UserInputEvaluation = EvaluateRPN(UserInputInRPN)
+    UserInputEvaluationIsATarget = False
+    if UserInputEvaluation != -1:
+        for Count in range(0, len(Targets)):
+            if Targets[Count] == UserInputEvaluation:
+                Score += 4
+                Targets[Count] = -1
+                UserInputEvaluationIsATarget = True
+            difference = abs(Targets[Count] - UserInputEvaluation)
+            if difference < 5:
+                Score += 3
+            elif difference < 10:
+                Score += 2
+    return UserInputEvaluationIsATarget, Score
