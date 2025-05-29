@@ -1,0 +1,23 @@
+def CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+    Temp = []
+    for Item in NumbersAllowed:
+        if len(str(Item))>1:
+            for i in range(len(str(Item))):
+                Temp.append(int(str(Item)[i]))
+            Temp.append(Item)
+            if len(str(Item)) >= 3:
+                singleDigits = []
+                for i in range(len(str(Item))):
+                    singleDigits.append((str(Item)[i]))
+                Temp.append(int(singleDigits[0] + singleDigits[1]))
+                Temp.append(int(singleDigits[1] + singleDigits[2]))
+        else:
+            Temp.append(Item)
+    print(Temp)
+    for Item in UserInputInRPN:
+        if CheckValidNumber(Item, MaxNumber):
+            if int(Item) in Temp:
+                Temp.remove(int(Item))
+            else:
+                return False
+    return True
