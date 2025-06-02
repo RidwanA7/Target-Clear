@@ -1,0 +1,28 @@
+#same as fill gaps
+
+def CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score):
+    UserInputEvaluation = EvaluateRPN(UserInputInRPN)
+    UserInputEvaluationIsATarget = False
+    if UserInputEvaluation != -1:
+        for Count in range(0, len(Targets)):
+            if Targets[Count] == UserInputEvaluation:
+                Score += 2
+                Targets[Count] = -1
+                UserInputEvaluationIsATarget = True
+    gaps = 0
+    i = 0
+    while Targets[i] == -1:
+        i += 1
+    startPos = i
+    for j in range(i, len(Targets) - 1):
+        if Targets[j] == -1:
+            gaps += 1
+    while gaps != 0:
+        i = startPos
+        while Targets[i] != -1:
+            i += 1
+        for x in range(i, len(Targets) - 1):
+            Targets[x] = Targets[x + 1]
+        gaps -= 1
+
+    return UserInputEvaluationIsATarget, Score
