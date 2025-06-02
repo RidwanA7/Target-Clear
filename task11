@@ -1,0 +1,80 @@
+#help
+
+def Main():
+    NumbersAllowed = []
+    Targets = []
+    MaxNumberOfTargets = 20
+    MaxTarget = 0
+    MaxNumber = 0
+    TrainingGame = False
+    Choice = input("Enter y to play the training game, anything else to play a random game: ").lower()
+    print()
+    if Choice == "y":
+        MaxNumber = 1000
+        MaxTarget = 1000
+        TrainingGame = True
+        Targets = [-1, -1, -1, -1, -1, 23, 9, 140, 82, 121, 34, 45, 68, 75, 34, 23, 119, 43, 23, 119]
+    else:
+        MaxNumber = 10
+        MaxTarget = 50
+        Targets = CreateTargets(MaxNumberOfTargets, MaxTarget)
+    NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+    helpMode = False
+    helpInput = input("Do you want help mode: ")
+    if helpInput == "y":
+        helpMode = True
+    PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, helpMode)
+    input()
+
+
+def PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, helpMode):
+    Score = 0
+    GameOver = False
+    possibleExpression = []
+    while not GameOver:
+        DisplayState(Targets, NumbersAllowed, Score)
+        if helpMode:
+            for x in range(30):
+                operatorsAllowed = ["+", "-", "*", "/"]
+                numbers = []
+                numbersAllowedCopy = NumbersAllowed.copy()
+                operators = []
+                numberOfOperators = random.randint(1, 3)
+                for i in range(numberOfOperators + 1):
+                    numToAdd = numbersAllowedCopy[random.randint(0, len(numbersAllowedCopy)-1)]
+                    numbers.append(str(numToAdd))
+                    numbersAllowedCopy.remove(numToAdd)
+                for j in range(numberOfOperators):
+                    operators.append(operatorsAllowed[random.randint(0, 3)])
+                if numberOfOperators == 1:
+                    expression = numbers[0] + operators[0] + numbers[1]
+                if numberOfOperators == 2:
+                    expression = numbers[0] + operators[0] + numbers[1] + operators[1] + numbers[2]
+                if numberOfOperators == 3:
+                    expression = numbers[0] + operators[0] + numbers[1] + operators[1] + numbers[2] + operators[2] + \
+                                 numbers[3]
+
+                result = eval(expression)
+                if result in Targets:
+                    possibleExpression.append(expression)
+
+        for i in possibleExpression:
+            print("Could do", i)
+        UserInput = input("Enter an expression: ")
+        print()
+        while not CheckIfUserInputValid(UserInput):
+            print("Enter valid format")
+            UserInput = input("Enter an expression: ")
+        UserInputInRPN = ConvertToRPN(UserInput)
+        if CheckNumbersUsedAreAllInNumbersAllowed(NumbersAllowed, UserInputInRPN, MaxNumber):
+            IsTarget, Score = CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, Score)
+            if IsTarget:
+                NumbersAllowed = RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed)
+                NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber)
+        Score -= 1
+        if Targets[0] != -1:
+            GameOver = True
+        else:
+            Targets = UpdateTargets(Targets, TrainingGame, MaxTarget)
+    print("Game over!")
+    DisplayScore(Score)
